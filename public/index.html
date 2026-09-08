@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yuvi Bot Dashboard</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --bg-2: #111827;
+        --panel: rgba(17, 24, 39, 0.92);
+        --panel-strong: rgba(15, 23, 42, 0.98);
+        --muted: #94a3b8;
+        --text: #e2e8f0;
+        --white: #f8fafc;
+        --accent: #fbbf24;
+        --accent-2: #f59e0b;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --border: rgba(148, 163, 184, 0.18);
+        --shadow: 0 20px 40px rgba(15, 23, 42, 0.45);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #090d18 0%, #111827 50%, #0f172a 100%);
+        color: var(--text);
+      }
+
+      a { color: var(--accent); text-decoration: none; }
+      button, input, select, textarea { font: inherit; }
+
+      .shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 280px;
+        background: rgba(15, 23, 42, 0.96);
+        border-right: 1px solid var(--border);
+        padding: 22px 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .brand-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #161616;
+        display: grid;
+        place-items: center;
+        font-weight: bold;
+      }
+
+      .brand h2 { margin: 0; font-size: 1.1rem; }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav button {
+        width: 100%;
+        text-align: left;
+        border: 1px solid transparent;
+        background: rgba(148, 163, 184, 0.05);
+        padding: 12px 14px;
+        color: var(--text);
+        border-radius: 12px;
+        cursor: pointer;
+      }
+
+      .nav button.active {
+        background: rgba(251, 191, 36, 0.12);
+        border-color: rgba(251, 191, 36, 0.4);
+        color: var(--accent);
+      }
+
+      .server-picker {
+        margin-top: 18px;
+      }
+
+      .server-picker select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+      }
+
+      .main {
+        flex: 1;
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(251, 191, 36, 0.5);
+      }
+
+      .user-name {
+        font-weight: bold;
+      }
+
+      .logout {
+        background: rgba(248, 113, 113, 0.12);
+        border: 1px solid rgba(248, 113, 113, 0.4);
+        color: #fecaca;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      .login-panel, .dashboard-panel {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .login-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: var(--shadow);
+        max-width: 600px;
+        margin: 50px auto;
+        text-align: center;
+      }
+
+      .login-card h1 { margin-top: 0; }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #111827;
+        border: none;
+        font-weight: bold;
+        border-radius: 12px;
+        padding: 12px 18px;
+        cursor: pointer;
+      }
+
+      .secondary-btn {
+        background: rgba(148,163,184,0.08);
+        border: 1px solid var(--border);
+        color: var(--white);
+        border-radius: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .card .label {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .card .value {
+        margin-top: 8px;
+        font-size: clamp(1.6rem, 3vw, 2.3rem);
+        font-weight: bold;
+      }
+
+      .card.accent {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.08));
+        border-color: rgba(251, 191, 36, 0.35);
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 16px;
+      }
+
+      .section {
+        margin-top: 22px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .section h3 {
+        margin-top: 0;
+       margin-bottom: 12px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 6px;
+        font-size: 0.8rem;
+      }
+
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.86);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .toggle {
+        position: relative;
+        width: 46px;
+        height: 24px;
+        background: rgba(148,163,184,0.2);
+        border-radius: 99px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+      }
+
+      .toggle::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        transition: 0.2s ease;
+      }
+
+      .toggle.on {
+        background: rgba(52, 211, 153, 0.24);
+        border-color: rgba(52, 211, 153, 0.45);
+      }
+
+      .toggle.on::after { left: 25px; }
+
+      .hidden { display: none !important; }
+
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--accent);
+        font-size: 0.78rem;
+      }
+
+      @media (max-width: 900px) {
+        .shell { display: block; }
+        .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+        .two-col { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loginScreen" class="login-panel hidden">
+      <div class="login-card">
+        <div class="brand-badge" style="margin: 0 auto 14px; width: 58px; height: 58px;">Y</div>
+        <h1>Yuvi Bot Dashboard</h1>
+        <p style="color: var(--muted);">Secure server management for your Discord bot.</p>
+        <a class="primary-btn" href="/dashboard/login">Login with Discord</a>
+        <div style="margin-top: 14px;">
+          <a class="secondary-btn" href="/dashboard/login?demo=1">Demo admin access</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboardShell" class="shell hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">Y</div>
+            <div>
+              <h2>Yuvi Bot</h2>
+              <div class="badge" style="margin-top: 6px;">Powered by Yuvi</div>
+            </div>
+        <div class="nav">
+          <button class="nav-btn active" data-tab="home">Home</button>
+          <button class="nav-btn" data-tab="settings">Server Settings</button>
+          <button class="nav-btn" data-tab="profile">Bot Profile</button>
+          <button class="nav-btn" data-tab="ai">AI &amp; Chat</button>
+        </div>
+
+        <div class="server-picker">
+          <label for="guildSelect">Managed server</label>
+          <select id="guildSelect"></select>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="user-box">
+            <img id="userAvatar" class="avatar" alt="avatar" />
+            <div>
+              <div id="userName" class="user-name">Loading...</div>
+              <div id="userSystem" class="badge">Admin</div>
+            </div>
+          </div>
+          <form action="/dashboard/logout" method="POST">
+            <button class="logout" type="submit">Logout</button>
+          </form>
+        </div>
+
+        <div id="homeTab" class="dashboard-panel">
+          <div class="grid" id="overviewCards"></div>
+
+          <div class="two-col" style="margin-top: 20px;">
+            <div class="section">
+              <h3>Recent moderation + bot activity</h3>
+              <table>
+                <thead>
+                  <tr><th>Type</th><th>Action</th><th>Time</th></tr>
+                </thead>
+                <tbody id="activityTable"></tbody>
+              </table>
+            </div>
+
+            <div class="section">
+              <h3>Server status</h3>
+              <div id="serverStatus"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settingsTab" class="dashboard-panel hidden">
+          <div class="section">
+            <h3>Server settings</h3>
+            <form id="settingsForm">
+              <div class="form-grid">
+                <div>
+                  <label>Prefix</label>
+                  <input id="prefix" name="prefix" value="/" />
+                </div>
+                <div>
+                  <label>Language</label>
+                  <select id="language" name="language">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mix">Hinglish</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Timezone</label>
+                  <input id="timezone" name="timezone" value="UTC" />
+                </div>
+              </div>
+              <div style="margin-top: 18px; text-align: right;">
+                <button type="submit" class="primary-btn">Save settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="profileTab" class="dashboard-panel hidden">
+          <div class="section">
+            <h3>Bot Profile</h3>
+            <form id="botProfileForm">
+              <div class="form-grid">
+                <div>
+                  <label>Bot name</label>
+                  <input id="botName" />
+                </div>
+                <div>
+                  <label>Bot avatar URL</label>
+                  <input id="botAvatarUrl" />
+                </div>
+                <div>
+                  <label>Bot banner URL</label>
+                  <input id="botBannerUrl" />
+                </div>
+                <div>
+                  <label>Support server</label>
+                  <input id="supportServer" />
+                </div>
+                <div>
+                  <label>Website</label>
+                  <input id="websiteUrl" />
+                </div>
+                <div>
+                  <label>Dashboard URL</label>
+                  <input id="dashboardUrl" />
+                </div>
+              </div>
+
+              <div class="form-grid" style="margin-top: 18px;">
+                <div>
+                  <label>Branding text</label>
+                  <input id="brandingText" />
+                </div>
+                <div>
+                  <label>Powered by text</label>
+                  <input id="poweredByText" />
+                </div>
+                <div>
+                  <label>Status</label>
+                  <select id="statusState">
+                    <option value="online">Online</option>
+                    <option value="idle">Idle</option>
+                    <option value="dnd">Do Not Disturb</option>
+                    <option value="invisible">Invisible</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Activity type</label>
+                  <select id="activityTypeSelect">
+                    <option value="Playing">Playing</option>
+                    <option value="Watching">Watching</option>
+                    <option value="Listening">Listening</option>
+                    <option value="Competing">Competing</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top: 18px;">
+                <label>Status text</label>
+                <input id="statusText" />
+              </div>
+
+              <div style="margin-top: 18px;">
+                <label>About / bio</label>
+                <textarea id="botAbout"></textarea>
+              </div>
+
+              <div class="switch-row" style="margin-top: 18px;">
+                <span>Enable status rotation</span>
+                <button type="button" class="toggle on" id="rotationEnabledToggle"></button>
+              </div>
+
+              <div class="form-grid" style="margin-top: 18px;">
+                <div>
+                  <label>Rotation interval (ms)</label>
+                  <input id="rotationIntervalMs" type="number" min="5000" step="1000" />
+                </div>
+              </div>
+
+              <div style="margin-top: 18px;">
+                <label>Rotating statuses (one per line)</label>
+                <textarea id="rotatingStatuses"></textarea>
+              </div>
+
+              <div style="margin-top: 18px; text-align: right;">
+                <button type="submit" class="primary-btn">Save bot profile</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="aiTab" class="dashboard-panel hidden">
+          <div class="section">
+            <h3>AI &amp; Chat</h3>
+            <form id="aiForm">
+              <div class="switch-row">
+                <span>Normal message responses</span>
+                <button type="button" class="toggle on" id="normalMessageResponsesToggle" data-field="normalMessageResponses"></button>
+              </div>
+              <div class="switch-row">
+                <span>AI chat enabled</span>
+                <button type="button" class="toggle on" id="aiEnabledToggle" data-field="aiEnabled"></button>
+              </div>
+              <div class="switch-row">
+                <span>Mention-only mode</span>
+                <button type="button" class="toggle" id="mentionOnlyToggle" data-field="mentionOnlyMode"></button>
+              </div>
+
+              <div class="form-grid" style="margin-top: 18px;">
+                <div>
+                  <label>Allowed channels (comma separated IDs)</label>
+                  <input id="allowedChannels" />
+                </div>
+                <div>
+                  <label>Ignored channels (comma separated IDs)</label>
+                  <input id="ignoredChannels" />
+                </div>
+                <div>
+                  <label>Ignored roles (comma separated IDs)</label>
+                  <input id="ignoredRoles" />
+                </div>
+                <div>
+                  <label>Response cooldown (seconds)</label>
+                  <input id="responseCooldown" type="number" min="0" value="20" />
+                </div>
+              </div>
+
+              <div class="form-grid" style="margin-top: 18px;">
+                <div>
+                  <label>Owner name</label>
+                  <input id="ownerName" />
+                </div>
+                <div>
+                  <label>Age</label>
+                  <input id="ownerAge" type="number" />
+                </div>
+                <div>
+                  <label>Role</label>
+                  <input id="ownerRole" />
+                </div>
+                <div>
+                  <label>Focus</label>
+                  <input id="ownerFocus" />
+                </div>
+              </div>
+
+              <div style="margin-top: 18px;">
+                <label>Owner description</label>
+                <textarea id="ownerDescription"></textarea>
+              </div>
+
+              <div style="margin-top: 18px;">
+                <label>Bot personality / custom instructions</label>
+                <textarea id="customInstructions"></textarea>
+              </div>
+
+              <div class="form-grid" style="margin-top: 18px;">
+                <div>
+                  <label>Website</label>
+                  <input id="socialWebsite" />
+                </div>
+                <div>
+                  <label>GitHub</label>
+                  <input id="socialGithub" />
+                </div>
+                <div>
+                  <label>Instagram</label>
+                  <input id="socialInstagram" />
+                </div>
+                <div>
+                  <label>Discord</label>
+                  <input id="socialDiscord" />
+                </div>
+              </div>
+
+              <div style="margin-top: 18px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" id="testAiBtn" class="secondary-btn">Test response</button>
+                <button type="submit" class="primary-btn">Save AI settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const state = {
+        user: null,
+        managedGuilds: [],
+        selectedGuildId: null,
+        config: null,
+        overview: null
+      };
+
+      const navButtons = document.querySelectorAll('.nav-btn');
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          navButtons.forEach(item => item.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.dataset.tab;
+          document.getElementById('homeTab').classList.toggle('hidden', tab !== 'home');
+          document.getElementById('settingsTab').classList.toggle('hidden', tab !== 'settings');
+          document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+          document.getElementById('aiTab').classList.toggle('hidden', tab !== 'ai');
+        });
+      });
+
+      function setToggle(button, enabled) {
+        button.classList.toggle('on', !!enabled);
+      }
+
+      function formatDuration(seconds) {
+        const hrs = Math.floor((seconds || 0) / 3600);
+        const mins = Math.floor(((seconds || 0) % 3600) / 60);
+        return hrs ? `${hrs}h ${mins}m` : `${mins}m`;
+      }
+
+      async function fetchJson(url, options = {}) {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error || 'Request failed');
+        }
+        return response.json();
+      }
+
+      async function loadSession() {
+        try {
+          const session = await fetchJson('/api/dashboard/session');
+          if (!session.authenticated) {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboardShell').classList.add('hidden');
+            return;
+          }
+
+          state.user = session.user;
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('dashboardShell').classList.remove('hidden');
+          document.getElementById('userName').textContent = state.user.username;
+          document.getElementById('userAvatar').src = state.user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+          const guilds = await fetchJson('/api/dashboard/guilds');
+          state.managedGuilds = guilds.managedGuilds || [];
+          const guildSelect = document.getElementById('guildSelect');
+          guildSelect.innerHTML = state.managedGuilds.map(guild => `<option value="${guild.id}">${guild.name}</option>`).join('');
+
+          if (state.managedGuilds.length) {
+            state.selectedGuildId = state.managedGuilds[0].id;
+            guildSelect.value = state.selectedGuildId;
+            await refreshGuildData();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      document.getElementById('guildSelect').addEventListener('change', async (event) => {
+        state.selectedGuildId = event.target.value;
+        await refreshGuildData();
+      });
+
+      async function refreshGuildData() {
+        if (!state.selectedGuildId) return;
+        const overview = await fetchJson(`/api/dashboard/overview/${state.selectedGuildId}`);
+        state.overview = overview;
+        renderOverview(overview);
+        const config = await fetchJson(`/api/dashboard/config/${state.selectedGuildId}`);
+        state.config = config;
+        fillConfigForm(config);
+      }
+
+      function renderOverview(data) {
+        const guild = data.guild;
+        const stats = data.stats || {};
+
+        const cards = [
+          { label: 'Server name', value: guild.name, accent: true },
+          { label: 'Members', value: guild.memberCount },
+          { label: 'Bot status', value: guild.status },
+          { label: 'Bot ping', value: `${guild.botPing}ms` },
+          { label: 'DB status', value: guild.databaseStatus },
+          { label: 'Uptime', value: `${Math.round(guild.uptime)}s` },
+          { label: 'Warnings', value: stats.warnings },
+          { label: 'Active tickets', value: stats.activeTickets },
+          { label: 'Active giveaways', value: stats.activeGiveaways }
+        ];
+
+        document.getElementById('overviewCards').innerHTML = cards.map(card => `
+          <div class="card ${card.accent ? 'accent' : ''}">
+            <div class="label">${card.label}</div>
+            <div class="value">${card.value}</div>
+          </div>
+        `).join('');
+
+        const recent = data.recentActivity || [];
+        document.getElementById('activityTable').innerHTML = recent.length ? recent.map(item => `
+          <tr>
+            <td>${item.type}</td>
+            <td>${item.message}</td>
+            <td>${new Date(item.createdAt).toLocaleString()}</td>
+          </tr>
+        `).join('') : '<tr><td colspan="3">No recent activity</td></tr>';
+
+        document.getElementById('serverStatus').innerHTML = `
+          <p><strong>Server:</strong> ${guild.name}</p>
+          <p><strong>Discord bot:</strong> ${guild.status === 'Bot Offline' ? '<span style="color:#f87171;">Bot Offline</span>' : guild.status}</p>
+          <p><strong>Icon:</strong> ${guild.icon ? `<img src="${guild.icon}" style="width:42px;height:42px;border-radius:50%;" />` : 'No icon'}</p>
+          <p><strong>Members:</strong> ${guild.memberCount}</p>
+          <p><strong>Levels:</strong> ${stats.levelData?.averageLevel || 1}</p>
+          <p><strong>XP total:</strong> ${stats.levelData?.totalXp || 0}</p>
+        `;
+      }
+
+      async function loadBotProfile() {
+        const botProfile = await fetchJson(`/api/dashboard/bot-profile/${state.selectedGuildId}`);
+        document.getElementById('botName').value = botProfile.botName || 'Yuvi Bot';
+        document.getElementById('botAvatarUrl').value = botProfile.avatarUrl || '';
+        document.getElementById('botBannerUrl').value = botProfile.bannerUrl || '';
+        document.getElementById('supportServer').value = botProfile.supportServer || '';
+        document.getElementById('websiteUrl').value = botProfile.website || '';
+        document.getElementById('dashboardUrl').value = botProfile.dashboardUrl || '';
+        document.getElementById('brandingText').value = botProfile.branding || 'Made by Yuvi';
+        document.getElementById('poweredByText').value = botProfile.poweredBy || 'Powered by Yuvi';
+        document.getElementById('statusText').value = botProfile.statusText || 'Made by Yuvi • /help';
+        document.getElementById('statusState').value = botProfile.status || 'online';
+        document.getElementById('activityTypeSelect').value = botProfile.activityType || 'Playing';
+        document.getElementById('botAbout').value = botProfile.about || 'A powerful all-in-one Discord bot made by Yuvi.';
+        document.getElementById('rotationIntervalMs').value = botProfile.rotationIntervalMs || 20000;
+        setToggle(document.getElementById('rotationEnabledToggle'), botProfile.rotationEnabled !== false);
+        document.getElementById('rotatingStatuses').value = (botProfile.rotatingStatuses || []).join('\n');
+      }
+
+      function fillConfigForm(config) {
+        const ai = config.aiChat || {};
+        const owner = config.ownerProfile || {};
+        document.getElementById('prefix').value = config.prefix || '/';
+        document.getElementById('language').value = config.language || 'en';
+        document.getElementById('timezone').value = config.timezone || 'UTC';
+
+        setToggle(document.getElementById('normalMessageResponsesToggle'), ai.normalMessageResponses !== false);
+        setToggle(document.getElementById('aiEnabledToggle'), ai.enabled !== false);
+        setToggle(document.getElementById('mentionOnlyToggle'), !!ai.mentionOnlyMode);
+        document.getElementById('allowedChannels').value = (ai.allowedChannels || []).join(', ');
+        document.getElementById('ignoredChannels').value = (ai.ignoredChannels || []).join(', ');
+        document.getElementById('ignoredRoles').value = (ai.ignoredRoles || []).join(', ');
+        document.getElementById('responseCooldown').value = ai.responseCooldown || 20;
+        document.getElementById('ownerName').value = owner.name || 'Yuvi';
+        document.getElementById('ownerAge').value = owner.age || 14;
+        document.getElementById('ownerRole').value = owner.role || 'Server Owner & Bot Developer';
+        document.getElementById('ownerFocus').value = owner.focus || 'Discord Server Development & Bot Making';
+        document.getElementById('ownerDescription').value = owner.description || 'Custom editable description';
+        document.getElementById('customInstructions').value = ai.customInstructions || 'Be helpful, friendly, and concise.';
+        document.getElementById('socialWebsite').value = owner.socialLinks?.website || '';
+        document.getElementById('socialGithub').value = owner.socialLinks?.github || '';
+        document.getElementById('socialInstagram').value = owner.socialLinks?.instagram || '';
+        document.getElementById('socialDiscord').value = owner.socialLinks?.discord || '';
+      }
+
+      document.getElementById('settingsForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = {
+          prefix: document.getElementById('prefix').value,
+          language: document.getElementById('language').value,
+          timezone: document.getElementById('timezone').value
+        };
+
+        await fetchJson(`/api/dashboard/config/${state.selectedGuildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        await refreshGuildData();
+      });
+
+      document.getElementById('botProfileForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = {
+          botName: document.getElementById('botName').value,
+          avatarUrl: document.getElementById('botAvatarUrl').value,
+          bannerUrl: document.getElementById('botBannerUrl').value,
+          about: document.getElementById('botAbout').value,
+          statusText: document.getElementById('statusText').value,
+          activityType: document.getElementById('activityTypeSelect').value,
+          status: document.getElementById('statusState').value,
+          rotationEnabled: document.getElementById('rotationEnabledToggle').classList.contains('on'),
+          rotationIntervalMs: Number(document.getElementById('rotationIntervalMs').value || 20000),
+          rotatingStatuses: document.getElementById('rotatingStatuses').value.split('\n').map(v => v.trim()).filter(Boolean),
+          supportServer: document.getElementById('supportServer').value,
+          website: document.getElementById('websiteUrl').value,
+          dashboardUrl: document.getElementById('dashboardUrl').value,
+          poweredBy: document.getElementById('poweredByText').value,
+          branding: document.getElementById('brandingText').value
+        };
+
+        await fetchJson(`/api/dashboard/bot-profile/${state.selectedGuildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        await refreshGuildData();
+        await loadBotProfile();
+      });
+
+      document.getElementById('aiForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const aiChat = {
+          enabled: document.getElementById('aiEnabledToggle').classList.contains('on'),
+          normalMessageResponses: document.getElementById('normalMessageResponsesToggle').classList.contains('on'),
+          mentionOnlyMode: document.getElementById('mentionOnlyToggle').classList.contains('on'),
+          allowedChannels: document.getElementById('allowedChannels').value.split(',').map(v => v.trim()).filter(Boolean),
+          ignoredChannels: document.getElementById('ignoredChannels').value.split(',').map(v => v.trim()).filter(Boolean),
+          ignoredRoles: document.getElementById('ignoredRoles').value.split(',').map(v => v.trim()).filter(Boolean),
+          responseCooldown: Number(document.getElementById('responseCooldown').value || 20),
+          customInstructions: document.getElementById('customInstructions').value
+        };
+
+        const ownerProfile = {
+          name: document.getElementById('ownerName').value,
+          age: Number(document.getElementById('ownerAge').value || 14),
+          role: document.getElementById('ownerRole').value,
+          focus: document.getElementById('ownerFocus').value,
+          description: document.getElementById('ownerDescription').value,
+          socialLinks: {
+            website: document.getElementById('socialWebsite').value,
+            github: document.getElementById('socialGithub').value,
+            instagram: document.getElementById('socialInstagram').value,
+            discord: document.getElementById('socialDiscord').value
+          }
+        };
+
+        await fetchJson(`/api/dashboard/config/${state.selectedGuildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ aiChat, ownerProfile })
+        });
+        await refreshGuildData();
+      });
+
+      document.getElementById('testAiBtn').addEventListener('click', async () => {
+        const sampleText = 'owner kon hai?';
+        const result = await fetchJson(`/api/dashboard/test-ai/${state.selectedGuildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: sampleText })
+        });
+        alert(result.reply || 'No response');
+      });
+
+      document.querySelectorAll('.toggle').forEach(button => {
+        button.addEventListener('click', () => {
+          button.classList.toggle('on');
+        });
+      });
+
+      loadSession();
+    </script>
+  </body>
+</html>
+
