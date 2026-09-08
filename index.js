@@ -42,17 +42,17 @@ const DEFAULT_BOT_PROFILE = {
   botName: "Yuvi Bot",
   avatarUrl: "",
   bannerUrl: "",
-  about: "A powerful all-in-one Discord bot made by Yuvi, built to help manage, protect and grow your server. Includes moderation, AutoMod, logging, tickets, giveaways, reaction roles, leveling, welcome systems, custom commands and much more.",
-  statusText: "Made by Yuvi • /help",
+  about: "Yuvi Bot — made for server protection, anti-nuke, anti-spam, moderation, security, logging and server management.",
+  statusText: "Managing Server",
   activityType: "Playing",
   status: "online",
-  rotationEnabled: true,
+  rotationEnabled: false,
   rotationIntervalMs: 20000,
   rotatingStatuses: [
-    "Made by Yuvi • /help",
-    "Managing your server • Made by Yuvi",
-    "Moderation • Tickets • Giveaways",
-    "Helping your community • Made by Yuvi"
+    "Managing Server",
+    "Managing Server",
+    "Managing Server",
+    "Managing Server"
   ],
   supportServer: "",
   website: "",
@@ -137,7 +137,7 @@ async function ensureGuildConfig(guildId) {
   if (!guildId) return null;
 
   const existing = await GuildConfig.findOne({ guildId });
-  if (existing) return existing;
+  if (existing) {     existing.about = "Yuvi Bot — made for server protection, anti-nuke, anti-spam, moderation, security, logging and server management.";     existing.statusText = "Managing Server";     existing.activityType = "Playing";     existing.rotationEnabled = false;     existing.rotatingStatuses = ["Managing Server"];     await existing.save();     return existing;   }
 
   const created = await GuildConfig.create({ guildId });
   return created;
@@ -145,7 +145,7 @@ async function ensureGuildConfig(guildId) {
 
 async function getBotProfile() {
   const existing = await BotProfile.findOne({ profileId: "bot-profile" });
-  if (existing) return existing;
+  if (existing) {     existing.about = "Yuvi Bot — made for server protection, anti-nuke, anti-spam, moderation, security, logging and server management.";     existing.statusText = "Managing Server";     existing.activityType = "Playing";     existing.rotationEnabled = false;     existing.rotatingStatuses = ["Managing Server"];     await existing.save();     return existing;   }
 
   const created = await BotProfile.create({
     profileId: "bot-profile",
