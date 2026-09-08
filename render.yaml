@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: yuvi-bot-dashboard
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DASHBOARD_PORT
+        value: 10000
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: BOT_HEARTBEAT_TIMEOUT_MS
+        value: 30000
+      - key: TOKEN
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: DISCORD_REDIRECT_URI
+        sync: false
+      - key: NITRO_EMOJI_ID
+        sync: false
+      - key: NITRO_EMOJI_NAME
+        sync: false
+      - key: LOG_CHANNEL_ID
+        sync: false

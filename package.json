@@ -4,6 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "concurrently --names dashboard,bot \"node dashboard.js\" \"node index.js\"",
+    "start:dashboard": "node dashboard.js",
+    "start:bot": "node index.js",
+    "dev": "concurrently --names dashboard,bot \"nodemon --watch public --watch src --watch dashboard.js --ext js dashboard.js\" \"nodemon --watch src --watch index.js --ext js index.js\"",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:restart": "pm2 restart yuvi-bot",
+    "pm2:stop": "pm2 stop yuvi-bot",
+    "pm2:delete": "pm2 delete yuvi-bot",
+    "pm2:logs": "pm2 logs yuvi-bot",
+    "pm2:status": "pm2 status",
     "test": "echo \"Error: no test specified && exit 1"
   },
   "keywords": [],
@@ -13,8 +23,14 @@
   "dependencies": {
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.7.0",
+    "express-session": "^1.19.0",
     "mongodb": "^7.6.0",
-    "mongoose": "^9.9.4",
-    "express": "^5.1.0"
+    "mongoose": "^9.9.4"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "nodemon": "^3.1.14"
   }
 }
